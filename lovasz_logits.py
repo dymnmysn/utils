@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-
+import torch.nn.functional as F
 
 def isnan(x):
     return x != x
@@ -115,3 +115,86 @@ class LovaszSoftmax(nn.Module):
         """
         probas = torch.softmax(logits, dim=1)
         return lovasz_softmax(probas, labels, self.classes, self.per_image, self.ignore)
+
+waymovalidfreqs = [160951307,
+ 69475897,
+ 7765250,
+ 3272170,
+ 1828020,
+ 503,
+ 248386,
+ 5913634,
+ 4865385,
+ 502838,
+ 8645906,
+ 488421,
+ 171792,
+ 197329,
+ 243989204,
+ 159686476,
+ 13575661,
+ 11267605,
+ 190620777,
+ 5444214,
+ 4198428,
+ 74503790,
+ 45916607]
+
+
+
+class WeightedCrossEntropyLoss(nn.Module):
+    def __init__(self, class_frequencies=waymovalidfreqs, ignore=0):
+        """
+        Args:
+            class_frequencies (list or tensor): Frequency of each class.
+            ignore (int): Class label to ignore.
+        """
+        super(WeightedCrossEntropyLoss, self).__init__()
+        self.ignore = ignore
+        
+        # Calculate weights as 1 / sqrt(freq)
+        class_frequencies = torch.tensor(class_frequencies, dtype=torch.float)
+        weights = 1.0 / torch.sqrt(class_frequencies)
+        weights[ignore] = 0  # Set ignore class weight to 0
+        self.weights = weights
+
+    def forward(self, logits, labels):
+        """
+        Forward pass of weighted cross-entropy loss.
+        Args:
+            logits: [B, C, H, W] Logits from the network (before softmax).
+            labels: [B, H, W] Ground truth labels.
+        """
+        return F.cross_entropy(logits, labels, weight=self.weights, ignore_index=self.ignore)
+
+
+class Lovasz_WCE(nn.Module):
+    def __init__(self, class_frequencies=waymovalidfreqs, lovasz_weight=1, cross_entropy_weight=1, ignore=0):
+        """
+        Args:
+            class_frequencies (list or tensor): Frequency of each class for weighted cross-entropy.
+            lovasz_weight (float): Weight of Lovasz loss in the combined loss.
+            cross_entropy_weight (float): Weight of cross-entropy loss in the combined loss.
+            ignore (int): Class label to ignore (unlabeled class).
+        """
+        super(CombinedLoss, self).__init__()
+        self.lovasz_loss = LovaszSoftmax(ignore=ignore)  # From previous code
+        self.cross_entropy_loss = WeightedCrossEntropyLoss(class_frequencies, ignore=ignore)
+        self.lovasz_weight = lovasz_weight
+        self.cross_entropy_weight = cross_entropy_weight
+
+    def forward(self, logits, labels):
+        """
+        Compute combined loss.
+        Args:
+            logits: [B, C, H, W] Logits from the network.
+            labels: [B, H, W] Ground truth labels.
+        """
+        # Calculate both losses
+        ce_loss = self.cross_entropy_loss(logits, labels)
+        lovasz_loss = self.lovasz_loss(logits, labels)
+        
+        # Weighted sum of both losses
+        combined_loss = self.lovasz_weight * lovasz_loss + self.cross_entropy_weight * ce_loss
+        return combined_loss
+
