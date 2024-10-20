@@ -155,7 +155,8 @@ class WeightedCrossEntropyLoss(nn.Module):
         # Calculate weights as 1 / sqrt(freq)
         class_frequencies = torch.tensor(class_frequencies, dtype=torch.float).to(device)
         weights = 1.0 / torch.sqrt(class_frequencies)
-        weights[ignore] = 0  # Set ignore class weight to 0
+        weights[ignore] = weights[ignore]/10  # Set ignore class weight to 0
+        weights = weights/sum(weights)
         self.weights = weights
 
     def forward(self, logits, labels):
