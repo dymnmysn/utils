@@ -140,6 +140,8 @@ waymovalidfreqs = [160951307,
  74503790,
  45916607]
 
+#Balance
+waymovalidfreqs = [f+20000 for f in waymovalidfreqs]
 
 
 class WeightedCrossEntropyLoss(nn.Module):
