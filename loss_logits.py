@@ -172,7 +172,7 @@ class WeightedCrossEntropyLoss(nn.Module):
 
 
 class Lovasz_WCE(nn.Module):
-    def __init__(self, class_frequencies=waymovalidfreqs, lovasz_weight=1, cross_entropy_weight=1, ignore=0):
+    def __init__(self, class_frequencies=waymovalidfreqs, lovasz_weight=1, cross_entropy_weight=0.4, ignore=0):
         """
         Args:
             class_frequencies (list or tensor): Frequency of each class for weighted cross-entropy.
