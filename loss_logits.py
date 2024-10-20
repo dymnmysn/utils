@@ -143,7 +143,7 @@ waymovalidfreqs = [160951307,
 
 
 class WeightedCrossEntropyLoss(nn.Module):
-    def __init__(self, class_frequencies=waymovalidfreqs, ignore=0):
+    def __init__(self, class_frequencies=waymovalidfreqs, ignore=0, device='cuda'):
         """
         Args:
             class_frequencies (list or tensor): Frequency of each class.
@@ -153,7 +153,7 @@ class WeightedCrossEntropyLoss(nn.Module):
         self.ignore = ignore
         
         # Calculate weights as 1 / sqrt(freq)
-        class_frequencies = torch.tensor(class_frequencies, dtype=torch.float)
+        class_frequencies = torch.tensor(class_frequencies, dtype=torch.float).to(device)
         weights = 1.0 / torch.sqrt(class_frequencies)
         weights[ignore] = 0  # Set ignore class weight to 0
         self.weights = weights
