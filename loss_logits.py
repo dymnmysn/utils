@@ -177,7 +177,7 @@ class Lovasz_WCE(nn.Module):
             cross_entropy_weight (float): Weight of cross-entropy loss in the combined loss.
             ignore (int): Class label to ignore (unlabeled class).
         """
-        super(CombinedLoss, self).__init__()
+        super(Lovasz_WCE, self).__init__()
         self.lovasz_loss = LovaszSoftmax(ignore=ignore)  # From previous code
         self.cross_entropy_loss = WeightedCrossEntropyLoss(class_frequencies, ignore=ignore)
         self.lovasz_weight = lovasz_weight
