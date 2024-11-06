@@ -42,7 +42,7 @@ class SegmentationDataset(Dataset):
 
 
         if not iswaymo:
-            ARCH = np.array([
+            self.ARCH = np.array([
                 [12.12, 12.32],  
                 [10.88, 11.47],  
                 [0.23, 6.91],    
