@@ -28,13 +28,13 @@ class SegmentationDataset(Dataset):
         self.fastfill = fastfill
         self.width = width
         
-        """        ARCH = np.array([[16.7921, 15.1336],
+        """        self.ARCH = np.array([[16.7921, 15.1336],
                         [ 1.6576, 16.8768],
                         [ 0.8692, 14.5421],
                         [ 0.2838,  3.2056],
                         [-0.0222,  0.4402]])"""
 
-        ARCH = np.array([[20.121, 13.786],
+        self.ARCH = np.array([[20.121, 13.786],
                         [ 1.74, 16.81],
                         [ 1.06, 14.05],
                         [ 0.288,  3.134],
@@ -42,6 +42,13 @@ class SegmentationDataset(Dataset):
 
 
         if not iswaymo:
+            ARCH = np.array([
+                [12.12, 12.32],  
+                [10.88, 11.47],  
+                [0.23, 6.91],    
+                [-1.04, 0.86],   
+                [0.21, 0.16]     
+            ])
             mapdict = sq_k2w
             max_index = max(mapdict.keys())  # Get the maximum class index from the mapdict
             lookup_tensor = torch.zeros(max_index + 1, dtype=torch.long)  # Create a lookup tensor
@@ -54,8 +61,8 @@ class SegmentationDataset(Dataset):
 
         self.iswaymo = iswaymo
 
-        self.shiftrange, self.scalerange = ARCH[0,0], ARCH[0,1]
-        self.shiftintensity, self.scaleintensity = ARCH[4,0], ARCH[4,1]
+        self.shiftrange, self.scalerange = self.ARCH[0,0], self.ARCH[0,1]
+        self.shiftintensity, self.scaleintensity = self.ARCH[4,0], self.ARCH[4,1]
     
     def __len__(self):
         return len(self.datapaths)
