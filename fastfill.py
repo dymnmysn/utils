@@ -29,16 +29,13 @@ def fast_interpolate(arr, thresholds=[5, 3], tofill = -1):
     return arr
 
 class FastFill:
-    def __init__(self, p=1, indices=[0,-1], thresholds=[5,3], tofill = -1, with_label=False, tofill_mask = None):
+    def __init__(self, p=1, indices=[0,-1], thresholds=[5,3], tofill = -1, with_label=False, tofill_label = 0):
         self.p = p
         self.indices = indices
         self.with_label = with_label
         self.thresholds = thresholds
         self.tofill = tofill 
-        if tofill_mask:
-            self.tofill_label = tofill_mask
-        else:
-            self.tofill_label = tofill
+        self.tofill_label = tofill_label
 
     def __call__(self, image, label):
         if random.random() < self.p:

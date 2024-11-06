@@ -1,4 +1,4 @@
-from mappings import sq_w2k, sq_k2w
+from mappings import sq_w2k, sq_k2w, sem2sem
 from torch.utils.data import Dataset
 import torch
 import numpy as np
@@ -8,7 +8,12 @@ import os
 
 class SegmentationDataset(Dataset):
     def __init__(self, root = '/ari/users/ibaskaya/projeler/lidar-bonnetal/datasets/kitti', split = 'training', 
-    transform=None, pretransform=None, fastfill=None, iswaymo=True, width=2656, unknown=0, xyz=False):
+    transform=None, pretransform=None, fastfill=None, iswaymo=False, width=2048, unknown=0, xyz=True):
+        """
+        Args:
+            parquet_files (list): List of paths to the parquet files.
+            transform (callable, optional): Optional transform to be applied on a sample.
+        """
         
         imagepaths = sorted(glob(os.path.join(root,split,'images','*.npz')))
         labelpaths = [i.replace('images','labels') for i in imagepaths]
@@ -44,15 +49,22 @@ class SegmentationDataset(Dataset):
                 [-1.04, 0.86],   
                 [0.21, 0.16]     
             ])
-            mapdict = sq_k2w
-            max_index = max(mapdict.keys())  
-            lookup_tensor = torch.zeros(max_index + 1, dtype=torch.long) 
+            mapdict = sem2sem
+            max_index = max(mapdict.keys()) 
+            lookup_tensor = torch.zeros(max_index + 1, dtype=torch.long)  
             for old_idx, new_idx in mapdict.items():
                 lookup_tensor[old_idx] = new_idx
             
             self.lookup_tensor = lookup_tensor
+
         else:
-            self.lookup_tensor = None
+            mapdict = sq_w2k
+            max_index = max(mapdict.keys()) 
+            lookup_tensor = torch.zeros(max_index + 1, dtype=torch.long)  
+            for old_idx, new_idx in mapdict.items():
+                lookup_tensor[old_idx] = new_idx
+            
+            self.lookup_tensor = lookup_tensor
 
         self.iswaymo = iswaymo
 
@@ -64,7 +76,6 @@ class SegmentationDataset(Dataset):
         self.mx, self.sx = self.ARCH[1,0], self.ARCH[1,1]
         self.my, self.sy = self.ARCH[2,0], self.ARCH[2,1]
         self.mz, self.sz = self.ARCH[3,0], self.ARCH[3,1]
-
     
     def __len__(self):
         return len(self.datapaths)
@@ -89,7 +100,7 @@ class SegmentationDataset(Dataset):
 
         if self.pretransform:
             image, label = self.pretransform(image, label)
-
+        
         mask = image[0]!=self.unknown
         
         rangeimage = (image[0,...]-self.shiftrange)/self.scalerange
@@ -110,19 +121,20 @@ class SegmentationDataset(Dataset):
             image = augmented['image'].to(torch.float32)
             label = augmented['mask'].to(torch.long)
 
+
         return image, label.squeeze()
 
 if __name__ == '__main__':
-    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/waymodataset/waymodataset', split = 'training', 
-    transform=None, pretransform=None, fastfill=None, iswaymo=True, width=2656)
+    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/semkitti_ready', split = 'training', 
+    transform=None, pretransform=None, fastfill=None, iswaymo=False, width=2048)
     sample = next(iter(sds))
     print('SIMPLE TEST')
     print(sample[0].shape,sample[1].shape)
     print('')
     from fastfill import FastFill
-    ff = FastFill()
-    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/waymodataset/waymodataset', split = 'training', 
-    transform=None, pretransform=None, fastfill=ff, iswaymo=True, width=2656)
+    ff = FastFill(tofill=0, indices=[0,1,2,3,4])
+    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/semkitti_ready', split = 'training', 
+    transform=None, pretransform=None, fastfill=ff, iswaymo=False, width=2048)
     sample = next(iter(sds))
     print('WITH FASTFILL')
     print(sample[0].shape,sample[1].shape)
@@ -132,16 +144,16 @@ if __name__ == '__main__':
     from albumentations.pytorch import ToTensorV2
     import cv2
     transform_train = A.Compose([
-        A.Resize(height=64, width=2650, interpolation=cv2.INTER_NEAREST, p=1),  # Resize
+        A.Resize(height=64, width=2048, interpolation=cv2.INTER_NEAREST, p=1),  # Resize
         A.ShiftScaleRotate(shift_limit=0.5, scale_limit=0.0, rotate_limit=0, border_mode=cv2.BORDER_WRAP, p=1),  # Shift left with wrap-around effect
-        A.RandomCrop(height = 64, width = 2650, p=1),
-        A.PadIfNeeded(min_height=64, min_width=2656, border_mode=0, value=0, mask_value=0),
+        A.RandomCrop(height = 64, width = 2048, p=1),
+        A.PadIfNeeded(min_height=64, min_width=2048, border_mode=0, value=0, mask_value=0),
         A.HorizontalFlip(p=1),  # Horizontal flip with 20% probability
         A.CoarseDropout(max_holes=2, max_height=64, max_width=256, min_holes=1, min_height=1, min_width=1, fill_value=0, p=1),  # CoarseDropout instead of Cutout
         ToTensorV2()  # Convert to PyTorch tensors
     ], additional_targets={'mask': 'image'})  # Apply same augmentations to mask
-    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/waymodataset/waymodataset', split = 'training', 
-    transform=transform_train, pretransform=None, fastfill=ff, iswaymo=True, width=2656)
+    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/semkitti_ready', split = 'training', 
+    transform=transform_train, pretransform=None, fastfill=ff, iswaymo=False, width=2048)
     sample = next(iter(sds))
     print('WITH FASTFILL AND ALBUMENTATION')
     print(sample[0].shape,sample[1].shape)
@@ -149,8 +161,8 @@ if __name__ == '__main__':
 
     from scale3d import RandomRescaleRangeImage
     pretransform = RandomRescaleRangeImage(p=1)
-    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/waymodataset/waymodataset', split = 'training', 
-    transform=transform_train, pretransform=pretransform, fastfill=ff, iswaymo=True, width=2656)
+    sds = SegmentationDataset(root = '/truba/home/myadiyaman/Downloads/semkitti_ready', split = 'training', 
+    transform=transform_train, pretransform=pretransform, fastfill=ff, iswaymo=False, width=2048)
     sample = next(iter(sds))
     print('WITH FASTFILL AND ALBUMENTATION AND SCALE')
     print(sample[0].shape,sample[1].shape)
