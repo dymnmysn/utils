@@ -1,0 +1,22 @@
+# Load data
+index = 200
+sx = 1.43
+sz = 2.184
+sy = 0
+s = np.array([sx,sy,sz])
+waymo_points_all = np.load(wifiles[index])['array'].astype(np.float32)
+waymo_points = waymo_points_all[1:4,...]
+waymo_points[2:4] = -1*waymo_points[2:4] 
+waymo_points[0] = waymo_points[0]-sx
+waymo_points[2] = waymo_points[2]+sz
+waymo_points = np.transpose(waymo_points,(1,2,0)).reshape(-1,3)
+waymo_labels = np.load(wlfiles[index])['array'].reshape(-1)
+waymo_points = waymo_points[(waymo_labels == 1) | (waymo_labels == 18)| (waymo_labels == 0)]
+waymo_labels = waymo_labels[(waymo_labels == 1) | (waymo_labels == 18)| (waymo_labels == 0)]
+waymo_colors = colorize_point_cloud(waymo_points, waymo_labels, color_map)
+
+Inclinations Waymo
+-0.314831	0.039103
+
+Kitti Height
+-1.75 road avg
