@@ -29,3 +29,9 @@ HydraKitti Model Results on Kitti
          5.9391e-01, 4.4516e-01], dtype=torch.float64))
 
 tensor(0.8831, dtype=torch.float64)
+
+QHydraKitti on Kitti
+(tensor(0.5431, dtype=torch.float64),
+ tensor([0.0000, 0.9057, 0.4242, 0.5253, 0.4090, 0.3838, 0.6265, 0.8070, 0.0000,
+         0.9181, 0.4134, 0.7698, 0.0040, 0.8193, 0.3124, 0.8087, 0.5992, 0.7122,
+         0.5746, 0.3049], dtype=torch.float64))
