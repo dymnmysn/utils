@@ -24,6 +24,32 @@ waymo2kitti= {
     'TYPE_SIDEWALK': "sidewalk"
 }
 
+waymo2kitti_mid= {
+    'TYPE_UNDEFINED': "unlabeled",
+    'TYPE_CAR': "car",
+    'TYPE_TRUCK': "truck",
+    'TYPE_BUS': "bus",
+    'TYPE_OTHER_VEHICLE': "other-vehicle",
+    'TYPE_MOTORCYCLIST': "motorcyclist",
+    'TYPE_BICYCLIST': "bicyclist",
+    'TYPE_PEDESTRIAN': "person",
+    'TYPE_SIGN': "traffic-sign",
+    'TYPE_TRAFFIC_LIGHT': "traffic-sign",
+    'TYPE_POLE': "pole",
+    'TYPE_CONSTRUCTION_CONE': "pole",
+    'TYPE_BICYCLE': "bicycle",
+    'TYPE_MOTORCYCLE': "motorcycle",
+    'TYPE_BUILDING': "building",
+    'TYPE_VEGETATION': "vegetation",
+    'TYPE_TREE_TRUNK': "trunk",
+    'TYPE_CURB': "unlabeled",
+    'TYPE_ROAD': "unlabeled",
+    'TYPE_LANE_MARKER': "lane-marking",
+    'TYPE_OTHER_GROUND': "other-ground",
+    'TYPE_WALKABLE': "other-ground",
+    'TYPE_SIDEWALK': "sidewalk"
+}
+
 waymo2kitti_safe= {
     'TYPE_UNDEFINED': "unlabeled",
     'TYPE_CAR': "car",
@@ -325,5 +351,8 @@ sq_w2k_safe = {k: sem2sem[w2k_safe[k]] for k in w2k.keys()}
 
 k2w_safe = {k: waymo_inv[kitti2waymo_safe[kitti[k]]] for k in kitti.keys()}
 sq_k2w_safe = k2w_safe
+
+w2k_mid = {k: kitti_inv[waymo2kitti_mid[waymo[k]]] for k in waymo.keys()}
+sq_w2k_mid = {k: sem2sem[w2k_mid[k]] for k in w2k.keys()}
 
 
