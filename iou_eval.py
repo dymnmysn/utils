@@ -54,8 +54,9 @@ class iouEval:
     def getStats(self):
         # remove fp and fn from confusion on the ignore classes cols and rows
         conf = self.conf_matrix.clone().double()
-        conf[self.ignore] = 0
-        conf[:, self.ignore] = 0
+        if ignore<self.n_classes:
+            conf[self.ignore] = 0
+            conf[:, self.ignore] = 0
 
         # get the clean stats
         tp = conf.diag()
