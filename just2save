@@ -68,7 +68,15 @@ Kitti Validation Acc.: 0.9071
         0.9413, 0.4491, 0.8117, 0.0235, 0.8572, 0.5139, 0.8539, 0.6476, 0.7409,
         0.5844, 0.4974], device='cuda:0', dtype=torch.float64))
 ########################################################
-        
+
+###################KITTI_RESULTS########################
+SalsaNext Original Model results with batch size of 1.
+Mean IoU:  (tensor(0.6101, device='cuda:0', dtype=torch.float64), tensor([0.0000, 0.9476, 0.4832, 0.4635, 0.7911, 0.4414, 0.7319, 0.8285, 0.0000,
+        0.9494, 0.4297, 0.8183, 0.0475, 0.8704, 0.5370, 0.8338, 0.6700, 0.6714,
+        0.6015, 0.4753], device='cuda:0', dtype=torch.float64))
+Accuracy:  tensor(0.9014, device='cuda:0', dtype=torch.float64)
+#########################################################
+
 Salsa on Kitti
 ###################KITTI_RESULTS########################
 Kitti Validation mIoU: 0.6097
