@@ -137,5 +137,15 @@ Waymo Validation Acc.: 0.2923
 ########################################################
 """
 
+"""Original SalsaNext with domain change on Waymo
+###################WAYMO_RESULTS########################
+Mean IoU:  (tensor(0.1154, device='cuda:0', dtype=torch.float64), tensor([0.0000e+00, 5.7786e-01, 5.1215e-04, 0.0000e+00, 2.8800e-02, 3.8017e-02,
+        7.5858e-02, 5.4813e-02, 0.0000e+00, 6.5099e-02, 0.0000e+00, 1.5552e-01,
+        3.9179e-02, 6.1373e-01, 0.0000e+00, 8.6681e-02, 1.1332e-01, 0.0000e+00,
+        1.8433e-01, 1.5824e-01], device='cuda:0', dtype=torch.float64))
+Accuracy:  tensor(0.4167, device='cuda:0', dtype=torch.float64)
+########################################################
+"""
+
 #SemKitti 4060 en iyisi
 #Waymok 2840 en iyisi
