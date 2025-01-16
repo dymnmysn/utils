@@ -18,6 +18,9 @@ waymo_colors = colorize_point_cloud(waymo_points, waymo_labels, color_map)
 Inclinations Waymo
 -0.314831	0.039103
 
+Delays: Fetch, Preprocess, Infer, Postprocess
+(0.003230873743693034, 0.015941993395487467, 0.175438, 0.012991023063659669)
+
 Kitti Height
 -1.75 road avg
 
